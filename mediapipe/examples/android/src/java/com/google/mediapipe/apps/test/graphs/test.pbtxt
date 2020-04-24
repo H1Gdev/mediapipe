@@ -1,0 +1,11 @@
+# https://github.com/google/mediapipe/blob/v0.7.5/mediapipe/framework/calculator.proto#L218
+
+input_stream: "input_video"
+output_stream: "output_video"
+
+# https://github.com/google/mediapipe/blob/v0.7.5/mediapipe/framework/calculator.proto#L220
+node {
+  calculator: "TestCalculator"
+  input_stream: "input_video"
+  output_stream: "output_video"
+}
