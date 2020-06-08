@@ -1,0 +1,31 @@
+// [Protocol Buffer]
+// https://developers.google.com/protocol-buffers
+
+// https://developers.google.com/protocol-buffers/docs/proto
+syntax = "proto2";
+
+package mediapipe;
+
+import "mediapipe/framework/calculator.proto";
+
+message TestCalculatorOptions {
+    // CalculatorOptions extensions
+    // https://github.com/google/mediapipe/blob/v0.7.5/mediapipe/framework/calculator_options.proto#L43
+    extend CalculatorOptions {
+        optional TestCalculatorOptions ext = 20000;
+    }
+
+    required string test_name = 1;
+    optional int32 test_id = 2;
+
+    enum TestEnum {
+        option allow_alias = true;
+        ZERO = 0;
+        REI = 0;
+        ONE = 1;
+        TWO = 2;
+    }
+    optional TestEnum test_enum = 3 [default = TWO];
+
+    repeated string test_values = 4;
+}

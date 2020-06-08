@@ -1,4 +1,5 @@
 #include "mediapipe/framework/calculator_framework.h"
+#include "mediapipe/calculators/test/test_calculator.pb.h"
 
 namespace mediapipe {
 
@@ -37,6 +38,37 @@ REGISTER_CALCULATOR(TestCalculator);
         else
             output.SetAny();
     }
+
+    // Options
+    // --
+    // node {
+    //   calculator: "TestCalculator"
+    //   node_options: {
+    //     [type.googleapis.com/mediapipe.TestCalculatorOptions] {
+    //       test_name: "test"
+    //     }
+    //   }
+    // }
+    // --
+    const auto& options = cc->Options<::mediapipe::TestCalculatorOptions>();
+    // [Protocol Buffer API]
+    // https://developers.google.com/protocol-buffers/docs/cpptutorial#the-protocol-buffer-api
+    const auto& test_name = options.test_name();
+    if (options.has_test_id())
+        const auto& test_id = options.test_id();
+    else
+        const auto& test_id_default = options.test_id();
+
+    ::mediapipe::TestCalculatorOptions::TestEnum test_enum_value = ::mediapipe::TestCalculatorOptions::ONE;
+    if (options.has_test_enum())
+        const auto& test_enum = options.test_enum();
+    else
+        const auto& test_enum_default = options.test_enum();
+
+    if (options.test_values_size() > 0)
+        const auto& head = options.test_values(0);
+    for (const auto& test_value : options.test_values())
+        DLOG(INFO) << test_value;
 
     return ::mediapipe::OkStatus();
 }
