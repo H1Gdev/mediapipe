@@ -8,4 +8,13 @@ node {
   calculator: "TestCalculator"
   input_stream: "input_video"
   output_stream: "output_video"
+  node_options: {
+    [type.googleapis.com/mediapipe.TestCalculatorOptions] {
+      test_name: "test"
+
+      test_values: "index:0"
+      test_values: "index:1"
+      test_values: "index:2"
+    }
+  }
 }

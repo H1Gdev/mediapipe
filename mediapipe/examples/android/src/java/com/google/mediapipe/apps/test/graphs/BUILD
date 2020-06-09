@@ -18,4 +18,6 @@ mediapipe_binary_graph(
     name = "mobile_binary_graph",
     graph = "test.pbtxt",
     output_name = "test.binarypb",
+    # for node_options type.
+    deps = [":mobile_calculators"],
 )
