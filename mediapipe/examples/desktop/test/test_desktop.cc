@@ -53,6 +53,20 @@ int main(int argc, char** argv) {
   // Use glog.
   google::InitGoogleLogging(argv[0]);
 
+#if 1
+    LOG(INFO) << "test log of INFO level.";
+    LOG(WARNING) << "test log of WARNING level.";
+    LOG(ERROR) << "test log of ERROR level.";
+#if 0
+    // Kill process.
+    // ref. google::InstallFailureSignalHandler()
+    LOG(FATAL) << "test log of FATAL level.";
+#endif
+
+    // For Debug.
+    DLOG(INFO) << "test debug log of INFO level.";
+#endif
+
   CHECK(mediapipe::TestHelloWorld().ok());
   return 0;
 }
