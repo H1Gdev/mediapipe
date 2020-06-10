@@ -15,6 +15,7 @@ public:
 REGISTER_CALCULATOR(TestCalculator);
 
 ::mediapipe::Status TestCalculator::GetContract(CalculatorContract* cc) {
+    DLOG(INFO) << "[S][" << cc->GetNodeName() << "]GetContract()";
     // Input/Output stream:
     // <TAG>:<INDEX>:<NAME>
     //
@@ -70,16 +71,23 @@ REGISTER_CALCULATOR(TestCalculator);
     for (const auto& test_value : options.test_values())
         DLOG(INFO) << test_value;
 
+    DLOG(INFO) << "[E][" << cc->GetNodeName() << "]GetContract()";
     return ::mediapipe::OkStatus();
 }
 
 ::mediapipe::Status TestCalculator::Open(CalculatorContext* cc) {
+    DLOG(INFO) << "[S][" << cc->NodeName() << "]Open() " << cc->InputTimestamp();
+    DLOG(INFO) << "[CalculatorContext]";
+    DLOG(INFO) << ".CalculatorType()=" << cc->CalculatorType();
+    DLOG(INFO) << ".NodeId()=" << cc->NodeId();
+    DLOG(INFO) << "[E][" << cc->NodeName() << "]Open()";
     // if error occurs, graph terminates.
     return ::mediapipe::OkStatus();
 }
 
 ::mediapipe::Status TestCalculator::Process(CalculatorContext* cc) {
     // if there is no input(s) from input_stream(s), Process() will not be called and there will be no output(s) to output_stream(s).
+    DLOG(INFO) << "[S][" << cc->NodeName() << "]Process() " << cc->InputTimestamp();
 
     // InputStreamShard and OutputStreamShard.
     const auto output_all_begin_id = cc->Outputs().BeginId();
@@ -92,11 +100,14 @@ REGISTER_CALCULATOR(TestCalculator);
             cc->Outputs().Get(id).AddPacket(cc->Inputs().Get(id).Value());
     }
 
+    DLOG(INFO) << "[E][" << cc->NodeName() << "]Process() " << cc->InputTimestamp();
     // if error occurs, framework calls Close() and graph terminates.
     return ::mediapipe::OkStatus();
 }
 
 ::mediapipe::Status TestCalculator::Close(CalculatorContext* cc) {
+    DLOG(INFO) << "[S][" << cc->NodeName() << "]Close() " << cc->InputTimestamp();
+    DLOG(INFO) << "[E][" << cc->NodeName() << "]Close()";
     // if Open() was succeeded, framework calls this.
     return ::mediapipe::OkStatus();
 }
