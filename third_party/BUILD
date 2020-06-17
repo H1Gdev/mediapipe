@@ -19,6 +19,27 @@ exports_files(["LICENSE"])
 
 package(default_visibility = ["//visibility:public"])
 
+# SNPE
+cc_library(
+    name = "snpe",
+    visibility = ["//visibility:public"],
+    deps = select({
+        "//mediapipe:android_armeabi": [
+            "@snpe//:libsnpe_armeabi-v7a",
+        ],
+        "//mediapipe:android_arm": [
+            "@snpe//:libsnpe_armeabi-v7a",
+        ],
+        "//mediapipe:android_arm64": [
+            "@snpe//:libsnpe_arm64-v8a",
+        ],
+        # "//conditions:default" instead of "no_match_error".
+        "//conditions:default": [
+            "@snpe//:libsnpe_x86_64",
+        ],
+    }),
+)
+
 cc_library(
     name = "glog",
     visibility = ["//visibility:public"],

@@ -2,6 +2,18 @@ workspace(name = "mediapipe")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
+# SNPE
+snpe_version = "1.39.1"
+snpe_revision = "2085"
+http_archive(
+    name = "snpe",
+    build_file = "@//third_party:snpe.BUILD",
+    strip_prefix = "snpe-{}.{}".format(snpe_version, snpe_revision),
+    type = "zip",
+    url = "https://developer.qualcomm.com/qfile/67732/snpe-{}.zip".format(snpe_version),
+    sha256 = "309b1fa30cc7e01a24a0a8c7d02824c6de273058a4c3a0f2709ae784ca853624",
+)
+
 # Kotlin
 rules_kotlin_version = "legacy-1.3.0"
 
