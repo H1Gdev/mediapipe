@@ -10,7 +10,10 @@ http_archive(
     build_file = "@//third_party:snpe.BUILD",
     strip_prefix = "snpe-{}.{}".format(snpe_version, snpe_revision),
     type = "zip",
-    url = "https://developer.qualcomm.com/qfile/67732/snpe-{}.zip".format(snpe_version),
+    # file, http or https.
+    # path can be either absolute or relative to main repository WORKSPACE file.
+    url = "file:./snpe-{}.zip".format(snpe_version),
+#   url = "https://developer.qualcomm.com/qfile/67732/snpe-{}.zip".format(snpe_version),
     sha256 = "309b1fa30cc7e01a24a0a8c7d02824c6de273058a4c3a0f2709ae784ca853624",
 )
 
