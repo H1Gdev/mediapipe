@@ -1,3 +1,4 @@
+#include "mediapipe/framework/port.h"
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/calculators/test/test_calculator.pb.h"
 
@@ -70,6 +71,23 @@ REGISTER_CALCULATOR(TestCalculator);
         const auto& head = options.test_values(0);
     for (const auto& test_value : options.test_values())
         DLOG(INFO) << test_value;
+
+    // Platform
+#ifdef MEDIAPIPE_MOBILE
+    LOG(INFO) << "Platform is Mobile.";
+#endif
+#ifdef MEDIAPIPE_ANDROID
+    LOG(INFO) << "Platform is Android.";
+#endif
+#ifdef MEDIAPIPE_IOS
+    LOG(INFO) << "Platform is iOS.";
+#endif
+#ifdef MEDIAPIPE_MEDIAPIPE_OSX
+    LOG(INFO) << "Platform is OS X.";
+#endif
+#ifdef MEDIAPIPE_DISABLE_GL_COMPUTE
+    LOG(INFO) << "Disable GL.";
+#endif
 
     DLOG(INFO) << "[E][" << cc->GetNodeName() << "]GetContract()";
     return ::mediapipe::OkStatus();
