@@ -41,6 +41,12 @@ cc_library(
 )
 
 cc_library(
+    name = "snpe_dsp",
+    visibility = ["//visibility:public"],
+    deps = ["@snpe//:libsnpe_dsp"],
+)
+
+cc_library(
     name = "glog",
     visibility = ["//visibility:public"],
     deps = select({

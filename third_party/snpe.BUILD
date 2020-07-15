@@ -16,3 +16,10 @@
     ["armeabi-v7a", "arm-android-clang6.0"],
     ["x86_64", "x86_64-linux-clang"],
 ]]
+
+cc_library(
+    name = "libsnpe_dsp",
+    srcs = glob(["lib/dsp/*.so"]),
+    visibility = ["//visibility:public"],
+    alwayslink = 1,
+)
