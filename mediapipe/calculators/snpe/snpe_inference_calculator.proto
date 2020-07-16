@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package mediapipe;
+
+import "mediapipe/framework/calculator.proto";
+
+message SnpeInferenceCalculatorOptions {
+    extend CalculatorOptions {
+        optional SnpeInferenceCalculatorOptions ext = 30000;
+    }
+    required string model_file_path = 1;
+}
