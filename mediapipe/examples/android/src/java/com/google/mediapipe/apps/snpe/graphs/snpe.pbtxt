@@ -1,0 +1,18 @@
+input_stream: "input_video"
+output_stream: "output_video"
+
+node {
+  calculator: "PassThroughCalculator"
+  input_stream: "input_video"
+  output_stream: "output_video"
+}
+
+node {
+  calculator: "SnpeInferenceCalculator"
+  input_stream: "input_video"
+  node_options: {
+    [type.googleapis.com/mediapipe.SnpeInferenceCalculatorOptions] {
+      model_file_path: "model.dlc"
+    }
+  }
+}
