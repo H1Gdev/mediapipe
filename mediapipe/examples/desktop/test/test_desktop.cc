@@ -47,6 +47,49 @@ namespace mediapipe {
   }
   return graph.WaitUntilDone();
 }
+
+::mediapipe::Status TestSidePacket() {
+  CalculatorGraphConfig config = ParseTextProtoOrDie<CalculatorGraphConfig>(R"(
+    input_stream: "in"
+    output_stream: "out"
+    node {
+      calculator: "TestCalculator"
+      input_stream: "in"
+      output_stream: "out"
+      input_side_packet: "PACKET:in"
+      output_side_packet: "PACKET:out"
+    }
+  )");
+
+  CalculatorGraph graph;
+  MP_RETURN_IF_ERROR(graph.Initialize(config));
+  ASSIGN_OR_RETURN(OutputStreamPoller poller, graph.AddOutputStreamPoller("out"));
+  MP_RETURN_IF_ERROR(graph.StartRun({
+    { "in", MakePacket<std::string>("Input Side Packet...") }
+  }));
+
+  for (auto i = 0; i < 10; ++i) {
+    auto packet = MakePacket<std::string>("Hello World!").At(Timestamp(i));
+    MP_RETURN_IF_ERROR(graph.AddPacketToInputStream("in", packet));
+  }
+
+  MP_RETURN_IF_ERROR(graph.CloseInputStream("in"));
+
+  mediapipe::Packet packet;
+  while (poller.Next(&packet)) {
+    if (packet.ValidateAsType<std::string>().ok())
+      LOG(INFO) << packet.Get<std::string>();
+  }
+
+  MP_RETURN_IF_ERROR(graph.WaitUntilDone());
+
+  // Get the output side packet by name after the graph is done.
+  ASSIGN_OR_RETURN(auto status_or_packet, graph.GetOutputSidePacket("out"));
+  if (status_or_packet.ValidateAsType<std::string>().ok())
+    LOG(INFO) << "[OUT]Side Packet: " << status_or_packet.Get<std::string>();
+
+  return ::mediapipe::OkStatus();
+}
 }  // namespace mediapipe
 
 int main(int argc, char** argv) {
@@ -67,6 +110,12 @@ int main(int argc, char** argv) {
     DLOG(INFO) << "test debug log of INFO level.";
 #endif
 
+  LOG(INFO) << "[START]Test Hello World";
   CHECK(mediapipe::TestHelloWorld().ok());
+  LOG(INFO) << "[END]Test Hello World";
+
+  LOG(INFO) << "[START]Test Side Packet";
+  CHECK(mediapipe::TestSidePacket().ok());
+  LOG(INFO) << "[END]Test Side Packet";
   return 0;
 }
