@@ -23,6 +23,10 @@ cc_library(
         ":snpe_inference_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework/port:status",
+        "//mediapipe/util:resource_util",
+        "//third_party:snpe",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/strings",
     ],
     alwayslink = 1,
 )

@@ -9,4 +9,53 @@ message SnpeInferenceCalculatorOptions {
         optional SnpeInferenceCalculatorOptions ext = 30000;
     }
     required string model_file_path = 1;
+
+    optional string runtime = 2;
+    optional string runtime_list = 3 [default = "cpu"];
+    enum PerformanceProfile {
+        option allow_alias = true;
+        DEFAULT = 0;
+        BALANCED = 0;
+        HIGH_PERFORMANCE = 1;
+        POWER_SAVER = 2;
+        SYSTEM_SETTINGS = 3;
+        SUSTAINED_HIGH_PERFORMANCE = 4;
+        BURST = 5;
+        LOW_POWER_SAVER = 6;
+        HIGH_POWER_SAVER = 7;
+        LOW_BALANCED = 8;
+    }
+    optional PerformanceProfile performance_profile = 4 [default = DEFAULT];
+    enum ProfilingLevel {
+        OFF = 0;
+        BASIC = 1;
+        DETAILED = 2;
+        MODERATE = 3;
+    }
+    optional ProfilingLevel profiling_level = 5 [default = OFF];
+    enum ExecutionPriorityHint {
+        NORMAL = 0;
+        HIGH = 1;
+        LOW = 2;
+    }
+    optional ExecutionPriorityHint execution_priority_hint = 6 [default = NORMAL];
+    optional bool debug_mode = 7 [default = false];
+    optional bool cpu_fallback_mode = 8 [default = false];
+    optional bool init_cache_mode = 9 [default = false];
+
+    message TensorMap {
+        required string stream = 1;
+        required string tensor = 2;
+    }
+    repeated TensorMap input_tensor_map = 10;
+    repeated TensorMap output_tensor_map = 11;
+    enum BufferType {
+        ITENSOR = 0;
+        USER_FLOAT_CPU = 1;
+        USER_FLOAT_GPU = 2;
+        USER_TF8 = 3;
+    }
+    optional BufferType buffer_type = 12 [default = ITENSOR];
+
+    optional string log_directory_path = 13;
 }
