@@ -18,3 +18,13 @@ cc_library(
     ],
     alwayslink = 1,
 )
+
+cc_test(
+    name = "test_calculator_test",
+    size = "small",
+    srcs = ["test_calculator_test.cc"],
+    deps = [
+        ":test_calculator",
+        "//mediapipe/framework/port:gtest_main",
+    ],
+)
