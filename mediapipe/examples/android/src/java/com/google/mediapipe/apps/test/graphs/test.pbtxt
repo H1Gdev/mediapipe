@@ -7,7 +7,7 @@ output_stream: "output_video"
 node {
   calculator: "TestCalculator"
   input_stream: "input_video"
-  output_stream: "output_video"
+  output_stream: "intermediate_video"
   node_options: {
     [type.googleapis.com/mediapipe.TestCalculatorOptions] {
       test_name: "test"
@@ -17,4 +17,11 @@ node {
       test_values: "index:2"
     }
   }
+}
+
+# subgraph
+node {
+  calculator: "TestSubgraph"
+  input_stream: "intermediate_video"
+  output_stream: "output_video"
 }

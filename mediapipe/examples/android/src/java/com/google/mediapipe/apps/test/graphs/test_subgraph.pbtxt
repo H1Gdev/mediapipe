@@ -1,0 +1,31 @@
+# subgraph
+
+# type is not mandatory. so, can use someone's text graph(*.pbtxt) as subgraph.
+type: "TestSubgraph"
+
+input_stream: "input"
+output_stream: "output"
+
+node {
+  calculator: "FlowLimiterCalculator"
+  input_stream: "input"
+  input_stream: "FINISHED:output"
+  input_stream_info: {
+    # link with input_stream.
+    tag_index: "FINISHED"
+    # allow "back edge".
+    back_edge: true
+  }
+  output_stream: "throttled_input"
+}
+
+node {
+  calculator: "TestCalculator"
+  input_stream: "throttled_input"
+}
+
+node {
+  calculator: "PassThroughCalculator"
+  input_stream: "throttled_input"
+  output_stream: "output"
+}
