@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package mediapipe;
+
+import "mediapipe/framework/mediapipe_options.proto";
+
+message TestOutputStreamHandlerOptions {
+  extend MediaPipeOptions {
+    optional TestOutputStreamHandlerOptions ext = 200000001;
+  }
+  optional string name = 1;
+}
