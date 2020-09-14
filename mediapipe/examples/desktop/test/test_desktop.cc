@@ -224,6 +224,75 @@ namespace mediapipe {
   }
   return graph.WaitUntilDone();
 }
+
+::mediapipe::Status TestStreamHandler() {
+  CalculatorGraphConfig config = ParseTextProtoOrDie<CalculatorGraphConfig>(R"(
+    # graph
+    input_stream_handler {
+      input_stream_handler: "TestInputStreamHandler"
+    }
+    output_stream_handler {
+      output_stream_handler: "TestOutputStreamHandler"
+    }
+
+    input_stream: "in"
+    output_stream: "out"
+    output_stream: "out1"
+    node {
+      calculator: "TestCalculator"
+      input_stream: "in"
+      output_stream: "out"
+
+      # node
+      input_stream_handler {
+        input_stream_handler: "TestInputStreamHandler"
+        options: {
+          [mediapipe.TestInputStreamHandlerOptions.ext]: {
+            name: 'TestCalculator'
+          }
+        }
+      }
+      output_stream_handler {
+        output_stream_handler: "TestOutputStreamHandler"
+        options: {
+          [mediapipe.TestOutputStreamHandlerOptions.ext]: {
+            name: 'TestCalculator'
+          }
+        }
+      }
+    }
+    node {
+      calculator: "TestCalculator"
+      input_stream: "in"
+      output_stream: "out1"
+    }
+  )");
+
+  CalculatorGraph graph;
+  MP_RETURN_IF_ERROR(graph.Initialize(config));
+  ASSIGN_OR_RETURN(OutputStreamPoller poller, graph.AddOutputStreamPoller("out"));
+  MP_RETURN_IF_ERROR(graph.StartRun({}));
+
+  for (auto i = 0; i < 4; ++i) {
+    // make Packet.
+    // Packet is chain style.
+    auto packet = MakePacket<std::string>("Hello World!").At(Timestamp(i));
+    MP_RETURN_IF_ERROR(graph.AddPacketToInputStream("in", packet));
+  }
+
+  // Close the input stream "in".
+  MP_RETURN_IF_ERROR(graph.CloseInputStream("in"));
+
+  // Get the output packets std::string.
+  mediapipe::Packet packet;
+  while (poller.Next(&packet)) {
+    // Check packet type.
+    if (packet.ValidateAsType<std::string>().ok())
+      // Output Log.
+      LOG(INFO) << packet.Get<std::string>();
+  }
+  return graph.WaitUntilDone();
+}
 }  // namespace mediapipe
 
 int main(int argc, char** argv) {
@@ -255,5 +324,9 @@ int main(int argc, char** argv) {
   LOG(INFO) << "[START]Test Threading";
   CHECK(mediapipe::TestThreading().ok());
   LOG(INFO) << "[END]Test Threading";
+
+  LOG(INFO) << "[START]Test Stream Handler";
+  CHECK(mediapipe::TestStreamHandler().ok());
+  LOG(INFO) << "[END]Test Stream Handler";
   return 0;
 }

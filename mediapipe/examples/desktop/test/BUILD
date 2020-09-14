@@ -7,5 +7,8 @@ cc_binary(
         "//mediapipe/framework/port:logging",
         "//mediapipe/framework/port:parse_text_proto",
         "//mediapipe/framework/port:status",
+    ] + [
+        "//mediapipe/framework/stream_handler/test:test_input_stream_handler",
+        "//mediapipe/framework/stream_handler/test:test_output_stream_handler",
     ],
 )
