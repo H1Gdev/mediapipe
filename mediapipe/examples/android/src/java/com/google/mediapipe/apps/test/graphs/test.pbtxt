@@ -25,3 +25,39 @@ node {
   input_stream: "intermediate_video"
   output_stream: "output_video"
 }
+
+# side packet to stream.
+node {
+  calculator: "ConstantSidePacketCalculator"
+  output_side_packet: "PACKET:0:constant_value_0"
+  output_side_packet: "PACKET:1:constant_value_1"
+  output_side_packet: "PACKET:2:constant_value_2"
+  options: {
+    [mediapipe.ConstantSidePacketCalculatorOptions.ext]: {
+      packet { float_value: 1.1f }
+      packet { float_value: 2.2f }
+      packet { float_value: 3.3f }
+    }
+  }
+}
+node {
+  calculator: "SidePacketToStreamCalculator"
+  input_stream: "TICK:input_video"
+  input_side_packet: "constant_value_0"
+  input_side_packet: "constant_value_1"
+  input_side_packet: "constant_value_2"
+  input_side_packet: "user_value_0"
+  output_stream: "AT_TICK:0:value_0"
+  output_stream: "AT_TICK:1:value_1"
+  output_stream: "AT_TICK:2:value_2"
+  output_stream: "AT_TICK:3:value_3"
+}
+node {
+  calculator: "ConcatenateFloatVectorCalculator"
+  input_stream: "value_0"
+  input_stream: "value_1"
+  input_stream: "value_2"
+  input_stream: "value_3"
+  output_stream: "output_value"
+}
+output_stream: "output_value"

@@ -22,6 +22,7 @@ node {
 node {
   calculator: "TestCalculator"
   input_stream: "throttled_input"
+  input_side_packet: "user_value_0"
 }
 
 node {

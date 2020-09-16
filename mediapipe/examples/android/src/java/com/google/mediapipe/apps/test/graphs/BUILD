@@ -5,6 +5,9 @@ cc_library(
     # calculators using in graph.
     deps = [
         "//mediapipe/calculators/test:test_calculator",
+        "//mediapipe/calculators/core:constant_side_packet_calculator",
+        "//mediapipe/calculators/core:side_packet_to_stream_calculator",
+        "//mediapipe/calculators/core:concatenate_vector_calculator",
     ] + [
         # subgraph
         ":test_subgraph",
