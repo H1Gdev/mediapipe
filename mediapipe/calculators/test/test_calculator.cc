@@ -2,6 +2,9 @@
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/calculators/test/test_calculator.pb.h"
 
+#include <chrono>
+#include <thread>
+
 namespace mediapipe {
 
 class TestCalculator : public CalculatorBase {
@@ -186,6 +189,11 @@ REGISTER_CALCULATOR(TestCalculator);
         output.Set(MakePacket<std::string>("Output Side Packet..."));
     }
 
+    const auto& options = cc->Options<::mediapipe::TestCalculatorOptions>();
+    if (options.set_offset())
+        // set offset to all output streams.
+        cc->SetOffset(TimestampDiff(0));
+
     DLOG(INFO) << "[E][" << cc->NodeName() << "]Open()";
     // if error occurs, graph terminates.
     return ::mediapipe::OkStatus();
@@ -194,6 +202,11 @@ REGISTER_CALCULATOR(TestCalculator);
 ::mediapipe::Status TestCalculator::Process(CalculatorContext* cc) {
     // if there is no input(s) from input_stream(s), Process() will not be called and there will be no output(s) to output_stream(s).
     DLOG(INFO) << "[S][" << cc->NodeName() << "]Process() " << cc->InputTimestamp();
+
+    const int64 busy_wait_us = 1 * 1000 * 1000;
+    const auto& options = cc->Options<::mediapipe::TestCalculatorOptions>();
+    if (options.busy_wait() & ::mediapipe::TestCalculatorOptions::BEFORE_OUTPUT)
+        std::this_thread::sleep_for(std::chrono::microseconds(busy_wait_us));
 
     // InputStreamShard and OutputStreamShard.
     const auto output_all_begin_id = cc->Outputs().BeginId();
@@ -220,6 +233,9 @@ REGISTER_CALCULATOR(TestCalculator);
             // go through Packet.
             cc->Outputs().Get(id).AddPacket(cc->Inputs().Get(id).Value());
     }
+
+    if (options.busy_wait() & ::mediapipe::TestCalculatorOptions::AFTER_OUTPUT)
+        std::this_thread::sleep_for(std::chrono::microseconds(busy_wait_us));
 
     DLOG(INFO) << "[E][" << cc->NodeName() << "]Process() " << cc->InputTimestamp();
     // if error occurs, framework calls Close() and graph terminates.

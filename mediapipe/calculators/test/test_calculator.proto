@@ -28,4 +28,13 @@ message TestCalculatorOptions {
     optional TestEnum test_enum = 3 [default = TWO];
 
     repeated string test_values = 4;
+
+    optional bool set_offset = 5;
+    enum BusyWait {
+        NONE = 0x0;
+        BEFORE_OUTPUT = 0x1;
+        AFTER_OUTPUT = 0x2;
+        BOTH = 0x3;
+    }
+    optional BusyWait busy_wait = 6 [default = NONE];
 }
