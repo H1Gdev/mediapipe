@@ -293,6 +293,80 @@ namespace mediapipe {
   }
   return graph.WaitUntilDone();
 }
+
+::mediapipe::Status TestInputStreams() {
+  CalculatorGraphConfig config = ParseTextProtoOrDie<CalculatorGraphConfig>(R"(
+    input_stream: "in_0"
+    input_stream: "in_1"
+    input_stream: "in_2"
+    output_stream: "out"
+
+    node {
+      calculator: "TestCalculator"
+      input_stream: "in_0"
+      output_stream: "out_in_0"
+    }
+    node {
+      calculator: "TestCalculator"
+      input_stream: "in_1"
+      output_stream: "out_in_1"
+    }
+    node {
+      calculator: "TestCalculator"
+      input_stream: "in_2"
+      output_stream: "out_in_2"
+      node_options: {
+        [type.googleapis.com/mediapipe.TestCalculatorOptions] {
+          test_name: "TestCalculator_2"
+          set_offset: true
+        }
+      }
+    }
+
+    node {
+      calculator: "TestCalculator"
+      input_stream: "out_in_0"
+      input_stream: "out_in_1"
+      input_stream: "out_in_2"
+      output_stream: "out"
+      input_stream_handler {
+        input_stream_handler: "TestInputStreamHandler"
+      }
+    }
+  )");
+
+  CalculatorGraph graph;
+  MP_RETURN_IF_ERROR(graph.Initialize(config));
+  ASSIGN_OR_RETURN(OutputStreamPoller poller, graph.AddOutputStreamPoller("out"));
+  MP_RETURN_IF_ERROR(graph.StartRun({}));
+
+  const auto num_streams = 3;
+  const auto num_packets = 1;
+
+  for (auto s = 0; s < num_streams; ++s) {
+    std::string input_name = "in_" + std::to_string(s);
+    for (auto i = 0; i < num_packets; ++i) {
+      // make Packet.
+      auto packet = MakePacket<std::string>(std::string("Hello in ") + input_name).At(Timestamp(i));
+      MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(input_name, packet));
+    }
+  }
+
+  for (auto i = 0; i < num_packets; ++i) {
+    mediapipe::Packet packet;
+    if (!poller.Next(&packet))
+      break;
+    if (packet.ValidateAsType<std::string>().ok())
+      LOG(INFO) << packet.Get<std::string>();
+  }
+
+  for (auto s = 0; s < num_streams; ++s) {
+    std::string input_name = "in_" + std::to_string(s);
+    MP_RETURN_IF_ERROR(graph.CloseInputStream(input_name));
+  }
+
+  return graph.WaitUntilDone();
+}
 }  // namespace mediapipe
 
 int main(int argc, char** argv) {
@@ -328,5 +402,9 @@ int main(int argc, char** argv) {
   LOG(INFO) << "[START]Test Stream Handler";
   CHECK(mediapipe::TestStreamHandler().ok());
   LOG(INFO) << "[END]Test Stream Handler";
+
+  LOG(INFO) << "[START]Test Input Streams";
+  CHECK(mediapipe::TestInputStreams().ok());
+  LOG(INFO) << "[END]Test Input Streams";
   return 0;
 }
