@@ -1,4 +1,4 @@
-package com.google.mediapipe.apps.test;
+package com.google.mediapipe.apps.test.java;
 
 import android.os.Bundle;
 import android.util.Log;

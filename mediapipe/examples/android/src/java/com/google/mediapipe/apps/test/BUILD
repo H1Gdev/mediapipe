@@ -16,11 +16,12 @@ cc_library(
     alwayslink = 1,
 )
 
+# Java
 android_binary(
     # target name can be omitted if it has the same name as directory.
     #name = "test_android",
     name = "test",
-    srcs = glob(["*.java"]),
+    srcs = glob(["**/*.java"]),
     assets = [
         "//mediapipe/examples/android/src/java/com/google/mediapipe/apps/test/graphs:test.binarypb",
     ],
@@ -29,7 +30,7 @@ android_binary(
     manifest_values = {
         "applicationId": "com.google.mediapipe.apps.test",
         "appName": "Test MediaPipe",
-        "mainActivity": ".MainActivity",
+        "mainActivity": ".java.MainActivity",
         "cameraFacingFront": "True",
         "binaryGraphName": "test.binarypb",
         "inputVideoStreamName": "input_video",
@@ -42,5 +43,43 @@ android_binary(
         ":mediapipe_jni_lib",
         "//mediapipe/examples/android/src/java/com/google/mediapipe/apps/basic:basic_lib",
         "//mediapipe/java/com/google/mediapipe/framework:android_framework",
+    ],
+)
+
+# Kotlin
+load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_android_library")
+
+kt_android_library(
+    name = "lib",
+    srcs = glob(["**/*.kt"]),
+    manifest = "//mediapipe/examples/android/src/java/com/google/mediapipe/apps/basic:AndroidManifest.xml",
+    resource_files = glob(["res/**"]),
+    deps = [
+        "//mediapipe/examples/android/src/java/com/google/mediapipe/apps/basic:basic_lib",
+    ],
+)
+
+android_binary(
+    name = "testkt",
+    assets = [
+        "//mediapipe/examples/android/src/java/com/google/mediapipe/apps/test/graphs:test.binarypb",
+    ],
+    assets_dir = "",
+    manifest = "//mediapipe/examples/android/src/java/com/google/mediapipe/apps/basic:AndroidManifest.xml",
+    manifest_values = {
+        "applicationId": "com.google.mediapipe.apps.test",
+        "appName": "Test MediaPipe kt",
+        "mainActivity": ".kotlin.MainActivity",
+        "cameraFacingFront": "True",
+        "binaryGraphName": "test.binarypb",
+        "inputVideoStreamName": "input_video",
+        "outputVideoStreamName": "output_video",
+        "flipFramesVertically": "True",
+        "converterNumBuffers": "2",
+    },
+    multidex = "native",
+    deps = [
+        ":lib",
+        ":mediapipe_jni_lib",
     ],
 )
