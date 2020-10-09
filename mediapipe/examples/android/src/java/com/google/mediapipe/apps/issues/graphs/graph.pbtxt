@@ -1,0 +1,33 @@
+input_stream: "input_video"
+output_stream: "output_video"
+
+node {
+  calculator: "LocalFileContentsCalculator"
+  input_side_packet: "FILE_PATH:file_path0"
+  output_side_packet: "CONTENTS:contents0"
+}
+
+node {
+  calculator: "LocalFileContentsCalculator"
+  input_side_packet: "FILE_PATH:file_path1"
+  output_side_packet: "CONTENTS:contents1"
+}
+
+node {
+  calculator: "SidePacketToStreamCalculator"
+  input_stream: "TICK:input_video"
+  input_side_packet: "contents0"
+  input_side_packet: "contents1"
+  output_stream: "AT_TICK:0:input_contents0"
+  output_stream: "AT_TICK:1:input_contents1"
+}
+
+node {
+  calculator: "PassThroughCalculator"
+  input_stream: "input_video"
+  input_stream: "input_contents0"
+  input_stream: "input_contents1"
+  output_stream: "output_video"
+  output_stream: "output_contents0"
+  output_stream: "output_contents1"
+}
