@@ -1,5 +1,6 @@
 #include "mediapipe/framework/port.h"
 #include "mediapipe/framework/calculator_framework.h"
+#include "mediapipe/framework/formats/detection.pb.h"
 #include "mediapipe/calculators/test/test_calculator.pb.h"
 
 #include <chrono>
@@ -14,6 +15,10 @@ public:
     ::mediapipe::Status Open(CalculatorContext* cc) override;
     ::mediapipe::Status Process(CalculatorContext* cc) override;
     ::mediapipe::Status Close(CalculatorContext* cc) override;
+
+private:
+    static constexpr char* kDetectionTag = "DETECTION";
+    static constexpr char* kDetectionsTag = "DETECTIONS";
 };
 
 REGISTER_CALCULATOR(TestCalculator);
@@ -112,6 +117,12 @@ REGISTER_CALCULATOR(TestCalculator);
         else
             output.SetAny();
     }
+    if (cc->Outputs().HasTag(kDetectionTag))
+        for (auto id = cc->Outputs().BeginId(kDetectionTag); id < cc->Outputs().EndId(kDetectionTag); ++id)
+            cc->Outputs().Get(id).Set<Detection>();
+    if (cc->Outputs().HasTag(kDetectionsTag))
+        for (auto id = cc->Outputs().BeginId(kDetectionsTag); id < cc->Outputs().EndId(kDetectionsTag); ++id)
+            cc->Outputs().Get(id).Set<std::vector<Detection>>();
     // input side packet
     for (auto& input : cc->InputSidePackets()) {
         input.SetAny();
@@ -232,6 +243,31 @@ REGISTER_CALCULATOR(TestCalculator);
 #endif
             // go through Packet.
             cc->Outputs().Get(id).AddPacket(cc->Inputs().Get(id).Value());
+    }
+
+    // Detection
+    // https://github.com/google/mediapipe/blob/master/mediapipe/framework/formats/detection.proto
+    if (cc->Outputs().HasTag(kDetectionTag)) {
+        Detection detection;
+        detection.add_label_id(0);
+        detection.add_score(0.8f);
+        for (auto id = cc->Outputs().BeginId(kDetectionTag); id < cc->Outputs().EndId(kDetectionTag); ++id) {
+            auto output_detection = absl::make_unique<Detection>(detection);
+            cc->Outputs().Get(id).Add(output_detection.release(), cc->InputTimestamp());
+        }
+    }
+    if (cc->Outputs().HasTag(kDetectionsTag)) {
+        std::vector<Detection> detections;
+        for (auto i = 0; i < 2; ++i) {
+            Detection detection;
+            detection.add_label_id(i);
+            detection.add_score(0.2f * i);
+            detections.push_back(detection);
+        }
+        for (auto id = cc->Outputs().BeginId(kDetectionsTag); id < cc->Outputs().EndId(kDetectionsTag); ++id) {
+            auto output_detections = absl::make_unique<std::vector<Detection>>(detections);
+            cc->Outputs().Get(id).Add(output_detections.release(), cc->InputTimestamp());
+        }
     }
 
     if (options.busy_wait() & ::mediapipe::TestCalculatorOptions::AFTER_OUTPUT)
