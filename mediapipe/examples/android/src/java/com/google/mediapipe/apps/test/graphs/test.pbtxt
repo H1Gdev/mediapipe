@@ -19,6 +19,17 @@ node {
   }
 }
 
+# for Detection
+node {
+  calculator: "TestCalculator"
+  input_stream: "intermediate_video"
+  output_stream: "dropped_video"
+  output_stream: "DETECTION:detection"
+  output_stream: "DETECTIONS:detections"
+}
+output_stream: "detection"
+output_stream: "detections"
+
 # subgraph
 node {
   calculator: "TestSubgraph"
